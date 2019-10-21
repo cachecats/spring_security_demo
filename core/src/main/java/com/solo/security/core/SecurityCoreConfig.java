@@ -1,0 +1,36 @@
+package com.solo.security.core;
+
+import com.solo.security.core.properties.SecurityProperties;
+import com.solo.security.core.validate.code.processor.ValidateCodeProcessor;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+
+/**
+ * @Author: solo
+ * @Date: 2019/10/12 6:01 PM
+ * @Version 1.0
+ */
+@Configuration
+@EnableConfigurationProperties(SecurityProperties.class)
+public class SecurityCoreConfig {
+
+  @Bean
+  public CorsConfiguration buildConfig() {
+    CorsConfiguration corsConfiguration = new CorsConfiguration();
+    corsConfiguration.addAllowedOrigin("*");
+    corsConfiguration.addAllowedHeader("*");
+    corsConfiguration.addAllowedMethod("*");
+    corsConfiguration.addExposedHeader("Authorization");
+    return corsConfiguration;
+  }
+
+//  @Bean
+//  public Map<String, ValidateCodeProcessor> map(){
+//    return new HashMap();
+//  }
+
+}
