@@ -1,6 +1,7 @@
 package com.solo.security.core.validate.code;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.context.request.ServletWebRequest;
 
 /**
  * 生成验证码的接口.
@@ -11,5 +12,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface ValidateCodeGenerator {
 
-  ValidateCode createCode(HttpServletRequest request);
+  ValidateCode generate(ServletWebRequest request);
+
 }

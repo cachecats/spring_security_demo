@@ -1,14 +1,17 @@
 package com.solo.security.core.validate.code.impl;
 
 import com.solo.security.core.validate.code.ValidateCode;
+import com.solo.security.core.validate.code.ValidateCodeException;
 import com.solo.security.core.validate.code.ValidateCodeGenerator;
+import com.solo.security.core.validate.code.ValidateCodeProcessor;
 import com.solo.security.core.validate.code.ValidateCodeType;
-import com.solo.security.core.validate.code.processor.ValidateCodeProcessor;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.web.HttpSessionSessionStrategy;
 import org.springframework.social.connect.web.SessionStrategy;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
 /**
@@ -38,9 +41,13 @@ public abstract class AbstractValidateCodeProcessor<C extends ValidateCode> impl
   }
 
   private C generate(ServletWebRequest request) {
-    String type = getProcessorType(request);
-    ValidateCodeGenerator validateCodeGenerator = validateCodeGenerators.get(type + "CodeGenerator");
-    return (C) validateCodeGenerator.createCode(request.getRequest());
+    String type = getValidateCodeType(request).toString().toLowerCase();
+    String generatorName = type + ValidateCodeGenerator.class.getSimpleName();
+    ValidateCodeGenerator validateCodeGenerator = validateCodeGenerators.get(generatorName);
+    if (validateCodeGenerator == null) {
+      throw new ValidateCodeException("验证码生成器" + generatorName + "不存在");
+    }
+    return (C) validateCodeGenerator.generate(request);
   }
 
   /**
@@ -63,5 +70,39 @@ public abstract class AbstractValidateCodeProcessor<C extends ValidateCode> impl
    */
   private String getProcessorType(ServletWebRequest request) {
     return StringUtils.substringAfter(request.getRequest().getRequestURI(), "/code/");
+  }
+
+  @Override
+  public void validate(ServletWebRequest request) {
+    ValidateCodeType processorType = getValidateCodeType(request);
+    String sessionKey = getSessionKey(request);
+    C codeInSession = (C) sessionStrategy.getAttribute(request, sessionKey);
+
+    String codeInRequest;
+    try {
+      codeInRequest = ServletRequestUtils
+          .getRequiredStringParameter(request.getRequest(),
+              processorType.getParamNameOnValidate());
+    } catch (ServletRequestBindingException e) {
+      throw new ValidateCodeException("获取验证码的值失败");
+    }
+
+    if (StringUtils.isBlank(codeInRequest)) {
+      throw new ValidateCodeException(processorType + "验证码的值不能为空");
+    }
+
+    if (codeInSession == null) {
+      throw new ValidateCodeException(processorType + "验证码不存在");
+    }
+    if (codeInSession.isExpired()) {
+      sessionStrategy.removeAttribute(request, sessionKey);
+      throw new ValidateCodeException(processorType + "验证码已过期");
+    }
+
+    if (!StringUtils.equals(codeInSession.getCode(), codeInRequest)) {
+      throw new ValidateCodeException(processorType + "验证码不匹配");
+    }
+
+    sessionStrategy.removeAttribute(request, sessionKey);
   }
 }

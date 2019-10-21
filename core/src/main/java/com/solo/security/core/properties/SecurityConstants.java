@@ -8,6 +8,11 @@ package com.solo.security.core.properties;
 public interface SecurityConstants {
 
   /**
+   * 默认的处理验证码的url前缀
+   */
+  String DEFAULT_VALIDATE_CODE_URL_PREFIX = "/code";
+
+  /**
    * 当请求需要身份认证时，默认跳转的url
    */
   String DEFAULT_UNAUTHENTICATION_URL = "/authentication/require";
@@ -18,11 +23,19 @@ public interface SecurityConstants {
   String DEFAULT_LOGIN_PROCESSING_URL_FORM = "/authentication/form";
 
   /**
+   * 默认的手机验证码登录请求处理url
+   */
+  String DEFAULT_LOGIN_PROCESSING_URL_MOBILE = "/authentication/mobile";
+
+
+  /**
    * 验证图片验证码时，http请求中默认的携带图片验证码信息的参数的名称
    */
-  public static final String DEFAULT_PARAMETER_NAME_CODE_IMAGE = "imageCode";
+  String DEFAULT_PARAMETER_NAME_CODE_IMAGE = "imageCode";
+
   /**
    * 验证短信验证码时，http请求中默认的携带短信验证码信息的参数的名称
    */
-  public static final String DEFAULT_PARAMETER_NAME_CODE_SMS = "smsCode";
+  String DEFAULT_PARAMETER_NAME_CODE_SMS = "smsCode";
+
 }

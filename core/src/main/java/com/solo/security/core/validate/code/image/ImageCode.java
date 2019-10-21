@@ -1,5 +1,6 @@
-package com.solo.security.core.validate.code;
+package com.solo.security.core.validate.code.image;
 
+import com.solo.security.core.validate.code.ValidateCode;
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -10,7 +11,7 @@ import lombok.Data;
  * @Version 1.0
  */
 @Data
-public class ImageCode extends ValidateCode{
+public class ImageCode extends ValidateCode {
 
   private BufferedImage image;
 

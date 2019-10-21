@@ -1,4 +1,4 @@
-package com.solo.security.core.validate.code.processor;
+package com.solo.security.core.validate.code.sms;
 
 import com.solo.security.core.validate.code.ValidateCode;
 import com.solo.security.core.validate.code.impl.AbstractValidateCodeProcessor;
@@ -14,7 +14,7 @@ import org.springframework.web.context.request.ServletWebRequest;
  * @Date: 2019/10/20 3:32 PM
  * @Version 1.0
  */
-@Component
+@Component("smsValidateCodeProcessor")
 public class SmsCodeProcessor extends AbstractValidateCodeProcessor<ValidateCode> {
 
   @Autowired

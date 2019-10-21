@@ -1,22 +1,20 @@
 package com.solo.security.browser;
 
+import com.solo.security.core.authentication.AbstractChannelSecurityConfig;
 import com.solo.security.core.authentication.mobile.SmsCodeAuthenticationSecurityConfig;
+import com.solo.security.core.properties.SecurityConstants;
 import com.solo.security.core.properties.SecurityProperties;
-import com.solo.security.core.validate.code.SmsCodeFilter;
-import com.solo.security.core.validate.code.ValidateCodeFilter;
+import com.solo.security.core.validate.code.ValidateCodeSecurityConfig;
 import javax.sql.DataSource;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.cors.CorsUtils;
@@ -28,7 +26,7 @@ import org.springframework.web.cors.CorsUtils;
  */
 //@Configuration
 @EnableWebSecurity
-public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
+public class BrowserSecurityConfig extends AbstractChannelSecurityConfig {
 
   @Autowired
   SecurityProperties securityProperties;
@@ -42,15 +40,12 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
   UserDetailsService myUserDetailsService;
   @Autowired
   SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig;
+  @Autowired
+  ValidateCodeSecurityConfig validateCodeSecurityConfig;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public ObjectMapper objectMapper() {
-    return new ObjectMapper();
   }
 
   @Bean
@@ -65,27 +60,14 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 
-    //图片验证码过滤器
-    ValidateCodeFilter validateCodeFilter = new ValidateCodeFilter();
-    validateCodeFilter.setAuthenticationFailureHandler(myAuthenticationFailureHandler);
-    validateCodeFilter.setSecurityProperties(securityProperties);
-    validateCodeFilter.afterPropertiesSet();
-
-    //短信验证码过滤器
-    SmsCodeFilter smsCodeFilter = new SmsCodeFilter();
-    smsCodeFilter.setAuthenticationFailureHandler(myAuthenticationFailureHandler);
-    smsCodeFilter.setSecurityProperties(securityProperties);
-    smsCodeFilter.afterPropertiesSet();
+    //应用 UsernamePassword 的配置
+    applyPasswordAuthenticationConfig(http);
 
     http
-        .addFilterBefore(smsCodeFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
-        .formLogin()
-        .loginPage("/authentication/require")
-        .loginProcessingUrl("/authentication/form")
-        .successHandler(myAuthenticationSuccessHandler)
-        .failureHandler(myAuthenticationFailureHandler)
-        .and()
+        .apply(validateCodeSecurityConfig)
+          .and()
+        .apply(smsCodeAuthenticationSecurityConfig)
+          .and()
         .rememberMe()
         .tokenRepository(persistentTokenRepository())
         .tokenValiditySeconds(securityProperties.getBrowser().getRememberMeSeconds())
@@ -94,15 +76,15 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         //处理跨域请求中的Preflight请求
         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-        .antMatchers("/authentication/require", "/code/*",
+        .antMatchers(SecurityConstants.DEFAULT_UNAUTHENTICATION_URL,
+            SecurityConstants.DEFAULT_VALIDATE_CODE_URL_PREFIX + "/*",
             securityProperties.getBrowser().getLoginPage()).permitAll()
         .anyRequest()
         .authenticated()
         .and()
         .cors()
         .and()
-        .csrf().disable()
-        .apply(smsCodeAuthenticationSecurityConfig);
+        .csrf().disable();
 
   }
 

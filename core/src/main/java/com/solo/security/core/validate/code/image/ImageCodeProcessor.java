@@ -1,6 +1,6 @@
-package com.solo.security.core.validate.code.processor;
+package com.solo.security.core.validate.code.image;
 
-import com.solo.security.core.validate.code.ImageCode;
+import com.solo.security.core.validate.code.image.ImageCode;
 import com.solo.security.core.validate.code.impl.AbstractValidateCodeProcessor;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -12,7 +12,7 @@ import org.springframework.web.context.request.ServletWebRequest;
  * @Date: 2019/10/20 3:25 PM
  * @Version 1.0
  */
-@Component
+@Component("imageValidateCodeProcessor")
 public class ImageCodeProcessor extends AbstractValidateCodeProcessor<ImageCode> {
 
   @Override
