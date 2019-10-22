@@ -37,7 +37,7 @@ solo:
         urls: /user
     social:
       qq:
-        app-id: 101564623
-        app-secret: 2cc99995cbf62f05fe2a6fda4771d7d4
+        app-id: xxx
+        app-secret: xxx
         providerId: qq
       filterProcessesUrl: /auth
