@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.social.security.SpringSocialConfigurer;
 import org.springframework.web.cors.CorsUtils;
 
 /**
@@ -42,6 +43,8 @@ public class BrowserSecurityConfig extends AbstractChannelSecurityConfig {
   SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig;
   @Autowired
   ValidateCodeSecurityConfig validateCodeSecurityConfig;
+  @Autowired
+  SpringSocialConfigurer soloSocialSecurityConfig;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -68,20 +71,26 @@ public class BrowserSecurityConfig extends AbstractChannelSecurityConfig {
           .and()
         .apply(smsCodeAuthenticationSecurityConfig)
           .and()
+        //SpringSocial第三方登录配置
+        .apply(soloSocialSecurityConfig)
+          .and()
         .rememberMe()
-        .tokenRepository(persistentTokenRepository())
-        .tokenValiditySeconds(securityProperties.getBrowser().getRememberMeSeconds())
-        .userDetailsService(myUserDetailsService)
-        .and()
+          .tokenRepository(persistentTokenRepository())
+          .tokenValiditySeconds(securityProperties.getBrowser().getRememberMeSeconds())
+          .userDetailsService(myUserDetailsService)
+          .and()
         .authorizeRequests()
         //处理跨域请求中的Preflight请求
-        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-        .antMatchers(SecurityConstants.DEFAULT_UNAUTHENTICATION_URL,
-            SecurityConstants.DEFAULT_VALIDATE_CODE_URL_PREFIX + "/*",
-            securityProperties.getBrowser().getLoginPage()).permitAll()
-        .anyRequest()
-        .authenticated()
-        .and()
+          .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+          .antMatchers(SecurityConstants.DEFAULT_UNAUTHENTICATION_URL,
+              SecurityConstants.DEFAULT_VALIDATE_CODE_URL_PREFIX + "/*",
+              securityProperties.getBrowser().getLoginPage(),
+              securityProperties.getBrowser().getSignUpUrl(),
+              "/user/register"
+          ).permitAll()
+          .anyRequest()
+          .authenticated()
+          .and()
         .cors()
         .and()
         .csrf().disable();

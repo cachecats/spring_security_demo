@@ -16,4 +16,6 @@ public class BrowserProperties {
   private LoginType loginType = LoginType.JSON;
   //记住我过期时间
   private int rememberMeSeconds = 3600;
+  //注册页面
+  private String signUpUrl = "/signUp.html";
 }
