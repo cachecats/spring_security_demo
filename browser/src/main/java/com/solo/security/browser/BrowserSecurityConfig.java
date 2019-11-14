@@ -25,7 +25,6 @@ import org.springframework.web.cors.CorsUtils;
  * @Date: 2019/10/11 6:32 PM
  * @Version 1.0
  */
-//@Configuration
 @EnableWebSecurity
 public class BrowserSecurityConfig extends AbstractChannelSecurityConfig {
 

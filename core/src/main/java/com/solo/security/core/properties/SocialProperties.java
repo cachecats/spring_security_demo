@@ -11,6 +11,7 @@ import lombok.Data;
 public class SocialProperties {
 
   private QQProperties qq = new QQProperties();
+  private WeixinProperties weixin = new WeixinProperties();
   //第三方登录默认的前缀 url
   private String filterProcessesUrl = "/auth";
 }

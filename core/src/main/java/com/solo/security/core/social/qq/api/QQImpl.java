@@ -1,7 +1,6 @@
 package com.solo.security.core.social.qq.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
@@ -33,7 +32,6 @@ public class QQImpl extends AbstractOAuth2ApiBinding implements QQ {
     log.info("result: {}", result);
     this.openId = StringUtils.substringBetween(result, "\"openid\":\"", "\"}");
     log.info("openId: {}", openId);
-
   }
 
   @Override
