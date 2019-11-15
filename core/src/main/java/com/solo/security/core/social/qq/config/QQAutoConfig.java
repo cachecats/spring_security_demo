@@ -2,14 +2,18 @@ package com.solo.security.core.social.qq.config;
 
 import com.solo.security.core.properties.QQProperties;
 import com.solo.security.core.properties.SecurityProperties;
+import com.solo.security.core.social.SoloConnectView;
 import com.solo.security.core.social.qq.connect.QQConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
 import org.springframework.social.config.annotation.SocialConfigurerAdapter;
 import org.springframework.social.connect.ConnectionFactory;
+import org.springframework.web.servlet.View;
 
 /**
  * @Author: solo
@@ -35,5 +39,12 @@ public class QQAutoConfig extends SocialConfigurerAdapter {
     return new QQConnectionFactory(qqProperties.getProviderId(), qqProperties.getAppId(),
         qqProperties.getAppSecret());
   }
+
+  @Bean({"connect/qqConnected", "connect/qqConnect"})
+  @ConditionalOnMissingBean(name = "qqConnectedView")
+  public View qqConnectedView(){
+    return new SoloConnectView();
+  }
+
 
 }

@@ -3,8 +3,8 @@ package com.solo.security.pojo;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.solo.security.validator.MyConstraint;
 import java.util.Date;
-import javax.validation.constraints.NotBlank;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * @Author: solo

@@ -45,3 +45,9 @@ solo:
         app-secret: ac9af4ee9dc8d41ad3f236ea55cf978b
         providerId: weixin
       filterProcessesUrl: /auth
+
+logging:
+  level:
+    org:
+      springframework:
+        web: trace
